@@ -44,3 +44,9 @@ args:
         required: false
         takes_value: true
         help: singlet posterior threshold, defaults to 0.90
+    - soup:
+        long: soup
+        short: s
+        required: false
+        takes_value: true
+        help: probability of cells being soup (based on ambient RNA estimate)
