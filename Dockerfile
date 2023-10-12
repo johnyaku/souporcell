@@ -1,4 +1,3 @@
-ARG SHA=regs/head/master.tar.gz 
 FROM continuumio/miniconda3:4.10.3
 SHELL ["/bin/bash", "-c"]
 
@@ -43,6 +42,7 @@ RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
 
+ARG SHA=regs/head/master.tar.gz 
 RUN cd /opt && \
     wget https://github.com/johnyaku/souporcell/archive/${SHA}.zip -O souporcell.zip && \
     unzip souporcell.zip && \
