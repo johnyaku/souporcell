@@ -9,7 +9,8 @@ parser.add_argument("-b", "--barcodes", required = True, help = "barcodes.tsv fr
 parser.add_argument("-f", "--fasta", required = True, help = "reference fasta file")
 parser.add_argument("-t", "--threads", required = True, type = int, help = "max threads to use")
 parser.add_argument("-o", "--out_dir", required = True, help = "name of directory to place souporcell files")
-parser.add_argument("-k", "--clusters", required = True, help = "number cluster, tbd add easy way to run on a range of k")
+parser.add_argument("-j", "--min_clusters", required = False, help ="")
+parser.add_argument("-k", "--clusters", required = True, help = "max number of clusters. If --min_clusters not specified then only this number of clusters will be used")
 parser.add_argument("-p", "--ploidy", required = False, default = "2", help = "ploidy, must be 1 or 2, default = 2")
 parser.add_argument("--min_alt", required = False, default = "10", help = "min alt to use locus, default = 10.")
 parser.add_argument("--min_ref", required = False, default = "10", help = "min ref to use locus, default = 10.")
@@ -513,7 +514,7 @@ def vartrix(args, final_vcf, final_bam):
 
 def souporcell(args, ref_mtx, alt_mtx, final_vcf):
     print("running souporcell clustering")
-    cluster_file = args.out_dir + "/clusters_tmp.tsv"
+    cluster_file = out_dir + "/clusters_tmp.tsv"
     with open(cluster_file, 'w') as log:
         with open(args.out_dir+"/clusters.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
@@ -587,7 +588,24 @@ if not os.path.exists(args.out_dir + "/vartrix.done"):
 ref_mtx = args.out_dir + "/ref.mtx"
 alt_mtx = args.out_dir + "/alt.mtx"
 if not(os.path.exists(args.out_dir + "/clustering.done")):
-    souporcell(args, ref_mtx, alt_mtx, final_vcf)
+    if args.min_cluster == None:
+        start_k = args.clusters
+        end_k = args.clusters
+    else:
+        start_k = args.min_clusters
+        end_k = args.clusters
+    for k in range(start_k, end_k+1):
+        souporcell(
+            out_dir=args.out_dir, 
+            clusters=args.clusters, 
+            barcodes=args.barcodes, 
+            min_alt=args.min_alt,
+            min_ref=args.min_ref,
+            threads=args.threads,
+            ref_mtx, 
+            alt_mtx, 
+            final_vcf
+            )
 cluster_file = args.out_dir + "/clusters_tmp.tsv"
 if not(os.path.exists(args.out_dir + "/troublet.done")):
     doublets(args, ref_mtx, alt_mtx, cluster_file)
