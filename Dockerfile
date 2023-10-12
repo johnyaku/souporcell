@@ -41,12 +41,13 @@ ENV RUSTUP_HOME=/opt/.cargo
 RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
+ENV SHA=553fe1c98833d3f25dd038dda81c2cfc33d5e370
 
 RUN cd /opt && \
-    wget https://github.com/johnyaku/souporcell/archive/6d2c70c567279083654fef680d687b1d7a5dc46a.zip -O souporcell.zip && \
+    wget https://github.com/johnyaku/souporcell/archive/$SHA.zip -O souporcell.zip && \
     unzip souporcell.zip && \
     rm souporcell.zip && \
-    mv souporcell-6d2c70c567279083654fef680d687b1d7a5dc46a souporcell && \
+    mv souporcell-$SHA souporcell && \
     cd souporcell/troublet && \
     cargo build --release && \
     cd /opt/souporcell/souporcell && \
