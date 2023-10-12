@@ -512,13 +512,13 @@ def vartrix(args, final_vcf, final_bam):
     subprocess.check_call(['touch', args.out_dir + "/vartrix.done"])
     return((ref_mtx, alt_mtx))
 
-def souporcell(args, ref_mtx, alt_mtx, final_vcf):
+def souporcell(args, k, ref_mtx, alt_mtx, final_vcf):
     print("running souporcell clustering")
-    cluster_file = out_dir + "/clusters_tmp.tsv"
+    cluster_file = args.out_dir + "/clusters_tmp" + str(k) + ".tsv"
     with open(cluster_file, 'w') as log:
         with open(args.out_dir+"/clusters.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
-            cmd = [directory+"/souporcell/target/release/souporcell", "-k",args.clusters, "-a", alt_mtx, "-r", ref_mtx, 
+            cmd = [directory+"/souporcell/target/release/souporcell", "-k", k, "-a", alt_mtx, "-r", ref_mtx, 
                 "--restarts", str(args.restarts), "-b", args.barcodes, "--min_ref", args.min_ref, "--min_alt", args.min_alt, 
                 "--threads", str(args.threads)]
             if not(args.known_genotypes == None):
@@ -527,12 +527,11 @@ def souporcell(args, ref_mtx, alt_mtx, final_vcf):
                     cmd.extend(['--known_genotypes_sample_names'] + args.known_genotypes_sample_names)
             print(" ".join(cmd))
             subprocess.check_call(cmd, stdout = log, stderr = err) 
-    subprocess.check_call(['touch', args.out_dir + "/clustering.done"])
     return(cluster_file)
 
-def doublets(args, ref_mtx, alt_mtx, cluster_file):
+def doublets(args, k, ref_mtx, alt_mtx, cluster_file):
     print("running souporcell doublet detection")
-    doublet_file = args.out_dir + "/clusters.tsv"
+    doublet_file = args.out_dir + "/clusters_" + str(k) + ".tsv"
     with open(doublet_file, 'w') as dub:
         with open(args.out_dir+"/doublets.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
@@ -587,30 +586,17 @@ if not os.path.exists(args.out_dir + "/vartrix.done"):
     vartrix(args, final_vcf, bam)
 ref_mtx = args.out_dir + "/ref.mtx"
 alt_mtx = args.out_dir + "/alt.mtx"
-if not(os.path.exists(args.out_dir + "/clustering.done")):
-    if args.min_cluster == None:
-        start_k = args.clusters
-        end_k = args.clusters
-    else:
-        start_k = args.min_clusters
-        end_k = args.clusters
-    for k in range(start_k, end_k+1):
-        souporcell(
-            out_dir=args.out_dir, 
-            clusters=args.clusters, 
-            barcodes=args.barcodes, 
-            min_alt=args.min_alt,
-            min_ref=args.min_ref,
-            threads=args.threads,
-            ref_mtx, 
-            alt_mtx, 
-            final_vcf
-            )
-cluster_file = args.out_dir + "/clusters_tmp.tsv"
-if not(os.path.exists(args.out_dir + "/troublet.done")):
+if args.min_cluster == None:
+    start_k = args.clusters
+    end_k = args.clusters
+else:
+    start_k = args.min_clusters
+    end_k = args.clusters
+for k in range(start_k, end_k+1):
+    souporcell(args, k, ref_mtx, alt_mtx, final_vcf)
+    cluster_file = args.out_dir + "/clusters_tmp_"+ str(k) + ".tsv"
     doublets(args, ref_mtx, alt_mtx, cluster_file)
-doublet_file = args.out_dir + "/clusters.tsv"
-if not(os.path.exists(args.out_dir + "/consensus.done")):
+    doublet_file = args.out_dir + "/clusters_"+ str(k) + ".tsv"
     consensus(args, ref_mtx, alt_mtx, doublet_file)
 print("done")
 
