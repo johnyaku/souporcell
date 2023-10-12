@@ -304,9 +304,10 @@ OPTIONS:
     -c, --clusters <clusters>                      cluster file output from schism
     -b, --debug <debug>...                         print debug info for index of cells listed
     -d, --doublet_prior <doublet_prior>            prior on doublets. Defaults to 0.5
-        --doublet_threshold <doublet_threshold>    doublet posterior threshold, defaults to 0.90
+        --min_doublet_threshold <doublet_threshold>    minimum doublet posterior threshold, defaults to 0.90. Doublet posterior must be higher than this threshold for a barcode to be called a doublet
+        --max_doublet_threshold <doublet_threshold>    maximum doublet posterior threshold, defaults to 0.05. Doublet posterior must be higher than this threshold for a barcode to be called a singlet
     -r, --refs <refs>                              ref allele counts per cell in sparse matrix format out of vartrix
-        --singlet_threshold <singlet_threshold>    singlet posterior threshold, defaults to 0.90
+        --min_singlet_threshold <singlet_threshold>    minimum singlet posterior threshold, defaults to 0.90. Singlet posterior must be higher than this threshold for a barcode to be called a singlet
 ```
 So generally
 ```

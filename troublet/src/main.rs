@@ -168,7 +168,7 @@ fn call_doublets(params: &Params, mut cluster_allele_counts: FnvHashMap<(usize,u
             let doublet_posterior = (best_doublet_log_prob - doublet_question_denom).exp();
             let mut assignment: Vec<String> = Vec::new(); assignment.push(cell_barcode.to_string());
             if best_singleton_log_prob > best_doublet_log_prob {
-                if singlet_posterior > params.singlet_threshold {
+                if singlet_posterior > params.min_singlet_threshold && doublet_posterior < params.max_doublet_threshold {
                     assignment.push(format!("singlet\t{}\t{}\t{}\t{}\t{}", best_singlet, singlet_posterior, doublet_posterior, best_singleton_log_prob, best_doublet_log_prob));
                     //print!("{}\tsinglet\t{}\t{}\t{}\t", cell_barcode, best_singlet, best_singleton_log_prob, best_doublet_log_prob);
                 } else {
@@ -181,7 +181,7 @@ fn call_doublets(params: &Params, mut cluster_allele_counts: FnvHashMap<(usize,u
                     //print!("{}\tunassigned\t{}\t{}\t{}\t", cell_barcode, best_singlet, best_singleton_log_prob, best_doublet_log_prob);
                 }
             } else {
-                if doublet_posterior >= params.doublet_threshold {
+                if doublet_posterior >= params.min_doublet_threshold {
                     if !all_removed.contains(&cell) {
                         all_removed.insert(cell);
                         new_removed.push(cell);
@@ -477,8 +477,9 @@ struct Params {
     p_soup: f64,
     doublet_prior: f64,
     debug: FnvHashSet<usize>,
-    doublet_threshold: f64,
-    singlet_threshold: f64,
+    min_doublet_threshold: f64,
+    max_doublet_threshold: f64,
+    min_singlet_threshold: f64,
 }
 
 fn load_params() -> Params {
@@ -500,10 +501,12 @@ fn load_params() -> Params {
         let cell = cell.to_string().parse::<usize>().unwrap();
         debug.insert(cell);
     }
-    let doublet_threshold = params.value_of("doublet_threshold").unwrap_or("0.9");
-    let doublet_threshold = doublet_threshold.to_string().parse::<f64>().unwrap();
-    let singlet_threshold = params.value_of("singlet_threshold").unwrap_or("0.9");
-    let singlet_threshold = singlet_threshold.to_string().parse::<f64>().unwrap();
+    let min_doublet_threshold = params.value_of("min_doublet_threshold").unwrap_or("0.9");
+    let min_doublet_threshold = min_doublet_threshold.to_string().parse::<f64>().unwrap();
+    let max_doublet_threshold = params.value_of("max_doublet_threshold").unwrap_or("0.05");
+    let max_doublet_threshold = max_doublet_threshold.to_string().parse::<f64>().unwrap();
+    let min_singlet_threshold = params.value_of("min_singlet_threshold").unwrap_or("0.9");
+    let min_singlet_threshold = min_singlet_threshold.to_string().parse::<f64>().unwrap();
 
     Params{
         alts: alts.to_string(),
@@ -512,7 +515,8 @@ fn load_params() -> Params {
         p_soup: soup,
         doublet_prior: doublet_prior,
         debug: debug,
-        doublet_threshold: doublet_threshold,
-        singlet_threshold: singlet_threshold,
+        min_doublet_threshold: min_doublet_threshold,
+        max_doublet_threshold: max_doublet_threshold,
+        min_singlet_threshold: min_singlet_threshold,
     }
 }
