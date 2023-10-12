@@ -1,3 +1,4 @@
+ARG SHA=regs/head/master.tar.gz 
 FROM continuumio/miniconda3:4.10.3
 SHELL ["/bin/bash", "-c"]
 
@@ -41,13 +42,12 @@ ENV RUSTUP_HOME=/opt/.cargo
 RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
-ENV SHA=6f86aacbbea75dcc02a3f2979d233498ae48269c
 
 RUN cd /opt && \
-    wget https://github.com/johnyaku/souporcell/archive/$SHA.zip -O souporcell.zip && \
+    wget https://github.com/johnyaku/souporcell/archive/${SHA}.zip -O souporcell.zip && \
     unzip souporcell.zip && \
     rm souporcell.zip && \
-    mv souporcell-$SHA souporcell && \
+    mv souporcell-${SHA} souporcell && \
     cd souporcell/troublet && \
     cargo build --release && \
     cd /opt/souporcell/souporcell && \
