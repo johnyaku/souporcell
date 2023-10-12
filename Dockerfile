@@ -41,7 +41,7 @@ ENV RUSTUP_HOME=/opt/.cargo
 RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
-ENV SHA=553fe1c98833d3f25dd038dda81c2cfc33d5e370
+ENV SHA=6f86aacbbea75dcc02a3f2979d233498ae48269c
 
 RUN cd /opt && \
     wget https://github.com/johnyaku/souporcell/archive/$SHA.zip -O souporcell.zip && \
