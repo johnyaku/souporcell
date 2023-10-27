@@ -586,7 +586,7 @@ if not os.path.exists(args.out_dir + "/vartrix.done"):
     vartrix(args, final_vcf, bam)
 ref_mtx = args.out_dir + "/ref.mtx"
 alt_mtx = args.out_dir + "/alt.mtx"
-if args.min_cluster == None:
+if args.min_clusters == None:
     start_k = args.clusters
     end_k = args.clusters
 else:
