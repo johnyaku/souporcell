@@ -514,7 +514,7 @@ def vartrix(args, final_vcf, final_bam):
 
 def souporcell(args, k, ref_mtx, alt_mtx, final_vcf):
     print("running souporcell clustering")
-    cluster_file = args.out_dir + "/clusters_tmp" + str(k) + ".tsv"
+    cluster_file = args.out_dir + "/clusters_tmp" + k + ".tsv"
     with open(cluster_file, 'w') as log:
         with open(args.out_dir+"/clusters.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
@@ -531,7 +531,7 @@ def souporcell(args, k, ref_mtx, alt_mtx, final_vcf):
 
 def doublets(args, k, ref_mtx, alt_mtx, cluster_file):
     print("running souporcell doublet detection")
-    doublet_file = args.out_dir + "/clusters_" + str(k) + ".tsv"
+    doublet_file = args.out_dir + "/clusters_" + k + ".tsv"
     with open(doublet_file, 'w') as dub:
         with open(args.out_dir+"/doublets.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
@@ -592,9 +592,9 @@ else:
     start_k = int(args.min_clusters)
 end_k = int(args.clusters)
 for k in range(start_k, end_k+1):
-    souporcell(args, k, ref_mtx, alt_mtx, final_vcf)
+    souporcell(args, str(k), ref_mtx, alt_mtx, final_vcf)
     cluster_file = args.out_dir + "/clusters_tmp_"+ str(k) + ".tsv"
-    doublets(args, ref_mtx, alt_mtx, cluster_file)
+    doublets(args, str(k), ref_mtx, alt_mtx, cluster_file)
     doublet_file = args.out_dir + "/clusters_"+ str(k) + ".tsv"
     consensus(args, ref_mtx, alt_mtx, doublet_file)
 print("done")
