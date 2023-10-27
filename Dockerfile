@@ -42,19 +42,6 @@ RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
 
-ARG SHA=regs/head/master.tar.gz 
-RUN cd /opt && \
-    wget https://github.com/johnyaku/souporcell/archive/${SHA}.zip -O souporcell.zip && \
-    unzip souporcell.zip && \
-    rm souporcell.zip && \
-    mv souporcell-${SHA} souporcell && \
-    cd souporcell/troublet && \
-    cargo build --release && \
-    cd /opt/souporcell/souporcell && \
-    cargo build --release
-
-ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
-
 RUN conda install -y python=3.6.13 && \
     conda install -y -c conda-forge mamba=0.17.0 && \
     mamba install -y -c conda-forge numpy=1.19.5 pandas=1.1.5 scipy=1.5.3 pyvcf=0.6.8 pystan=2.19.1.1 anndata=0.7.6 zarr=2.8.3 networkx=2.5.1 && \
@@ -108,3 +95,17 @@ ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_sc
 RUN chmod a+rx /opt/monitor_script.sh
 
 ENV PATH=/opt/vartrix:/opt:$PATH
+
+ARG CACHEBUST=1
+ARG SHA=regs/head/master.tar.gz 
+RUN cd /opt && \
+    wget https://github.com/johnyaku/souporcell/archive/${SHA}.zip -O souporcell.zip && \
+    unzip souporcell.zip && \
+    rm souporcell.zip && \
+    mv souporcell-${SHA} souporcell && \
+    cd souporcell/troublet && \
+    cargo build --release && \
+    cd /opt/souporcell/souporcell && \
+    cargo build --release
+
+ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
