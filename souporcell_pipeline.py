@@ -587,11 +587,10 @@ if not os.path.exists(args.out_dir + "/vartrix.done"):
 ref_mtx = args.out_dir + "/ref.mtx"
 alt_mtx = args.out_dir + "/alt.mtx"
 if args.min_clusters == None:
-    start_k = args.clusters
-    end_k = args.clusters
+    start_k = int(args.clusters)
 else:
-    start_k = args.min_clusters
-    end_k = args.clusters
+    start_k = int(args.min_clusters)
+end_k = int(args.clusters)
 for k in range(start_k, end_k+1):
     souporcell(args, k, ref_mtx, alt_mtx, final_vcf)
     cluster_file = args.out_dir + "/clusters_tmp_"+ str(k) + ".tsv"
