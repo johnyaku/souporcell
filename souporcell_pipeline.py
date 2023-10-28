@@ -514,7 +514,7 @@ def vartrix(args, final_vcf, final_bam):
 
 def souporcell(args, k, ref_mtx, alt_mtx, final_vcf):
     print("running souporcell clustering")
-    cluster_file = args.out_dir + "/clusters_tmp" + k + ".tsv"
+    cluster_file = args.out_dir + "/clusters_tmp_" + k + ".tsv"
     with open(cluster_file, 'w') as log:
         with open(args.out_dir+"/clusters.err",'w') as err:
             directory = os.path.dirname(os.path.realpath(__file__))
@@ -591,7 +591,9 @@ if args.min_clusters == None:
 else:
     start_k = int(args.min_clusters)
 end_k = int(args.clusters)
+print("Calculating clusters for k from "+str(start_k)+" to "+str(end_k))
 for k in range(start_k, end_k+1):
+    print("Clustering with k = "+str(k))
     souporcell(args, str(k), ref_mtx, alt_mtx, final_vcf)
     cluster_file = args.out_dir + "/clusters_tmp_"+ str(k) + ".tsv"
     doublets(args, str(k), ref_mtx, alt_mtx, cluster_file)
