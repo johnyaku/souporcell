@@ -304,6 +304,8 @@ def retag(args, minimap_tmp_files):
         retag_error_files[i].close()
         retag_out_files[i].close()
         assert not(p.returncode), "retag subprocess ended abnormally with code " + str(p.returncode)
+    for outfile in retag_files:
+        subprocess.check_call(["rm", outfile+.".out"])
 
 
     print("sorting retagged bam files")
